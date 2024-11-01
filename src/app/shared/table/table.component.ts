@@ -3,6 +3,9 @@ import { PageEvent } from '@angular/material/paginator';
 
 import { TableService } from './table.service';
 import { MatSelectChange } from '@angular/material/select';
+import { MatDialog } from '@angular/material/dialog';
+import { ComponentType } from '@angular/cdk/portal';
+import { AbstractDialog } from '../abstract-dialog/abstract-dialog';
 
 export interface ITableRequest {
   moduleId: string;
@@ -58,7 +61,10 @@ export abstract class TableComponent {
     pageSize: 5,
   };
 
-  constructor(private tableService: TableService) {}
+  constructor(
+    private tableService: TableService,
+    private readonly dialog: MatDialog
+  ) {}
 
   initTable(): void {
     this.initTableName();
@@ -108,7 +114,15 @@ export abstract class TableComponent {
     this.getData();
   }
 
-  openDialog(dialogComponent: any, inputData: any, callback: any) {
+  openDialog(dialogComponent: ComponentType<AbstractDialog>, inputData?: any, callback?: Function) {
+    const dialogRef = this.dialog.open(dialogComponent, {
+      width: '250px',
+      disableClose: true,
+      data: inputData
+    });
 
+    dialogRef.afterClosed().subscribe((res: any) => {
+      if(res && callback) callback(res);
+    })
   }
 }

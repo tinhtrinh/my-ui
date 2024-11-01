@@ -43,6 +43,10 @@ export class TableService {
       })
     })
   }
+
+  getFruits(): Observable<Array<string>> {
+    return new Observable((subcriber) => subcriber.next(FRUITS));
+  }
 }
 
 /** Builds and returns a new User. */

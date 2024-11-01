@@ -17,6 +17,8 @@
   <mat-label>Search</mat-label>
   <input matInput (keyup)="applySearch($event)" placeholder="Ex. Mia" #input>
 </mat-form-field>
+
+<button mat-button (click)="openMyNewDialog()">New</button>
   
 <div class="mat-elevation-z8">
   <table mat-table [dataSource]="rowData" matSort>

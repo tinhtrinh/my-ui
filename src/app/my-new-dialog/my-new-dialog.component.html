@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<div mat-dialog-content [formGroup]="formGroup">
+  <mat-form-field>
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" (keydown)="onChangeNameToGenId()">
+    @if(isDirty('name')) {
+      <mat-icon matSuffix (click)="undo('name')">undo</mat-icon>
+    }
+    <mat-error>{{ getErrorMessage('name') }}</mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>ID</mat-label>
+    <input matInput formControlName="id">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Fruit</mat-label>
+    <mat-select formControlName="fruit">
+      @for(fruit of fruits; track fruit) {
+        <mat-option [value]="fruit">{{ fruit }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+</div>
+
+<mat-dialog-actions>
+    <button mat-button (click)="onClose()">Cancel</button>
+    <button mat-button (click)="onSubmit()">Submit</button>
+</mat-dialog-actions>
