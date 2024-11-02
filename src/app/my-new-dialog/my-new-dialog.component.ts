@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { AbstractDialog } from '../shared/abstract-dialog/abstract-dialog';
 import { Observable } from 'rxjs';
 import { FormControl, FormGroup } from '@angular/forms';
-import { TableService } from '../shared/table/table.service';
+import { TableService } from '../shared/abstract-table/table.service';
 
 @Component({
   selector: 'app-my-new-dialog',

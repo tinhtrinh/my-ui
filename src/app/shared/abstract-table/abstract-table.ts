@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { inject } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
 import { TableService } from './table.service';
@@ -37,12 +37,7 @@ export interface IPaginator {
   pageSizeOptions: Array<number>
 }
 
-@Component({
-  selector: 'app-table',
-  templateUrl: './table.component.html',
-  styleUrl: './table.component.css'
-})
-export abstract class TableComponent {
+export abstract class AbstractTable {
   tableName: ITableName = {id: '', name: ''};
   tableNames: Array<ITableName> = [];
   displayedColumns: Array<string> = [];
@@ -61,10 +56,8 @@ export abstract class TableComponent {
     pageSize: 5,
   };
 
-  constructor(
-    private tableService: TableService,
-    private readonly dialog: MatDialog
-  ) {}
+  private tableService = inject(TableService);
+  private readonly dialog = inject(MatDialog);
 
   initTable(): void {
     this.initTableName();

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ITableName, ITableRequest, ITableResponse } from './table.component';
+import { ITableName, ITableRequest, ITableResponse } from './abstract-table';
 
 @Injectable({
   providedIn: 'root'

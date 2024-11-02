@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { TableComponent } from '../shared/table/table.component';
+import { AbstractTable } from '../shared/abstract-table/abstract-table';
 import { MyNewDialogComponent } from '../my-new-dialog/my-new-dialog.component';
 
 @Component({
@@ -7,7 +7,7 @@ import { MyNewDialogComponent } from '../my-new-dialog/my-new-dialog.component';
   templateUrl: './my-table.component.html',
   styleUrl: './my-table.component.css'
 })
-export class MyTableComponent extends TableComponent implements OnInit {
+export class MyTableComponent extends AbstractTable implements OnInit {
   ngOnInit(): void {
     this.getTableNames();
     this.initTable();
