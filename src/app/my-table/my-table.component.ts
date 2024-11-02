@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractTable } from '../shared/abstract-table/abstract-table';
+import { AbstractTable } from '../shared/table/abstract-table';
 import { MyNewDialogComponent } from '../my-new-dialog/my-new-dialog.component';
 
 @Component({
