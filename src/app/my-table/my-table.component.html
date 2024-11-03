@@ -19,48 +19,82 @@
 </mat-form-field>
 
 <button mat-button (click)="openMyNewDialog()">New</button>
+
+<button type="button" mat-button (click)="drawer.toggle(); getFilters()">
+  Open Filters
+</button>
   
-<div class="mat-elevation-z8">
-  <table mat-table [dataSource]="rowData" matSort>
+<mat-drawer-container autosize>
+  <mat-drawer #drawer mode="side">
+    <button mat-button (click)="saveFilters(); drawer.close()">Save</button>
+    <button mat-button (click)="drawer.close()">Cancel</button>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    @for(filter of filters; track filter) {
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>{{ filter.column }}</mat-card-title>
+          <mat-card-subtitle>{{ filter.operator }}</mat-card-subtitle>
+        </mat-card-header>
+  
+        <mat-card-content>
+          <p>{{ filter.value }}</p>
+        </mat-card-content>
+  
+        <mat-card-actions>
+          <button mat-button>Edit</button>
+          <button mat-button>Delete</button>
+        </mat-card-actions>
+      </mat-card>
+      <br/>
+    }
 
-    <!-- ID Column -->
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
-      <td mat-cell *matCellDef="let row"> {{row.id}} </td>
-    </ng-container>
+    <button mat-button (click)="addFilter()">Add</button>
+  </mat-drawer>
 
-    <!-- Progress Column -->
-    <ng-container matColumnDef="progress">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> Progress </th>
-      <td mat-cell *matCellDef="let row"> {{row.progress}}% </td>
-    </ng-container>
-
-    <!-- Name Column -->
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
-      <td mat-cell *matCellDef="let row"> {{row.name}} </td>
-    </ng-container>
-
-    <!-- Fruit Column -->
-    <ng-container matColumnDef="fruit">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> Fruit </th>
-      <td mat-cell *matCellDef="let row"> {{row.fruit}} </td>
-    </ng-container>
-
-    <!-- Row shown when there is no matching data. -->
-    <!-- <tr class="mat-row" *matNoDataRow>
-      <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
-    </tr> -->
-  </table>
-
-  <mat-paginator 
-    aria-label="Select page of users"
-    [length]="paginator.totalCount"
-    [pageSize]="paginator.pageSize"
-    [pageSizeOptions]="paginator.pageSizeOptions"
-    (page)="pageChange($event)"
-  ></mat-paginator>
-</div>
+  <mat-drawer-content>
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="rowData" matSort>
+    
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+          <td mat-cell *matCellDef="let row"> {{row.id}} </td>
+        </ng-container>
+    
+        <!-- Progress Column -->
+        <ng-container matColumnDef="progress">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Progress </th>
+          <td mat-cell *matCellDef="let row"> {{row.progress}}% </td>
+        </ng-container>
+    
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+          <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+        </ng-container>
+    
+        <!-- Fruit Column -->
+        <ng-container matColumnDef="fruit">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Fruit </th>
+          <td mat-cell *matCellDef="let row"> {{row.fruit}} </td>
+        </ng-container>
+    
+        <!-- Row shown when there is no matching data. -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
+        </tr>
+      </table>
+    
+      <mat-paginator 
+        aria-label="Select page of users"
+        [length]="paginator.totalCount"
+        [pageSize]="paginator.pageSize"
+        [pageSizeOptions]="paginator.pageSizeOptions"
+        (page)="pageChange($event)"
+      ></mat-paginator>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

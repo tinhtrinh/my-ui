@@ -16,6 +16,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatCardModule } from '@angular/material/card';
 
 import { AppComponent } from './app.component';
 import { MyTableComponent } from './my-table/my-table.component';
@@ -44,7 +45,8 @@ import { MyNewDialogComponent } from './my-new-dialog/my-new-dialog.component';
     MatDialogModule,
     MatIconModule,
     MatSnackBarModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MatCardModule
   ],
   providers: [],
   bootstrap: [AppComponent]

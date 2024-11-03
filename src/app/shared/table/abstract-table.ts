@@ -13,6 +13,7 @@ export interface ITableRequest {
   searchTerm: string;
   pageIndex: number;
   pageSize: number;
+  filters: Array<IFilter>;
 }
 
 export interface ITableResponse {
@@ -37,11 +38,25 @@ export interface IPaginator {
   pageSizeOptions: Array<number>
 }
 
+export interface IFilter {
+  column: string;
+  operator: string;
+  value: any;
+}
+
+export interface IFilterOption {
+  columns: Array<string>;
+  operators: Array<string>;
+  values: Array<any>;
+  valueType: any;
+}
+
 export abstract class AbstractTable {
   tableName: ITableName = {id: '', name: ''};
   tableNames: Array<ITableName> = [];
   displayedColumns: Array<string> = [];
   rowData: Array<any> = [];
+  filters: Array<IFilter> = []
   getDataUrl: string = '';
   paginator: IPaginator = {
     totalCount : 100,
@@ -54,6 +69,7 @@ export abstract class AbstractTable {
     searchTerm: '',
     pageIndex: 1,
     pageSize: 5,
+    filters: []
   };
 
   private tableService = inject(TableService);
@@ -105,6 +121,7 @@ export abstract class AbstractTable {
   tableNameChange(event: MatSelectChange) {
     this.tableRequest.tableId = event.value;
     this.getData();
+    this.getFilters();
   }
 
   openDialog(dialogComponent: ComponentType<AbstractDialog>, inputData?: any, callback?: Function) {
@@ -117,5 +134,20 @@ export abstract class AbstractTable {
     dialogRef.afterClosed().subscribe((res: any) => {
       if(res && callback) callback(res);
     })
+  }
+
+  getFilters(): void {
+    this.tableService.getFilters(this.tableRequest.tableId).subscribe((res) => {
+      this.filters = res;
+    })
+  }
+
+  saveFilters(): void {
+    this.tableRequest.filters = this.filters;
+    this.goToFirstPage();
+  }
+
+  addFilter(): void {
+    this.filters.push({ column: '', operator: '', value: '' })
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ITableName, ITableRequest, ITableResponse } from './abstract-table';
+import { IFilter, ITableName, ITableRequest, ITableResponse } from './abstract-table';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +46,26 @@ export class TableService {
 
   getFruits(): Observable<Array<string>> {
     return new Observable((subcriber) => subcriber.next(FRUITS));
+  }
+
+  getFilters(tableId: string): Observable<Array<IFilter>> {
+    let filters = [{
+      column: 'Name',
+      operator: 'equals',
+      value: 'test'
+    }]
+
+    if(tableId == '1') {
+      filters = [{
+        column: 'ID',
+        operator: 'Not equals',
+        value: 'test'
+      }]
+    }
+    
+    return new Observable(subscriber => {
+      subscriber.next(filters);
+    })
   }
 }
 
