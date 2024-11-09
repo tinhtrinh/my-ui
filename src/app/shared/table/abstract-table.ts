@@ -5,7 +5,8 @@ import { TableService } from './table.service';
 import { MatSelectChange } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
 import { ComponentType } from '@angular/cdk/portal';
-import { AbstractDialog } from '../abstract-dialog/abstract-dialog';
+import { AbstractDialog } from '../dialog/abstract-dialog';
+import { AbstractEditFilterDialog } from '../edit-filter-dialog/abstract-edit-filter-dialog';
 
 export interface ITableRequest {
   moduleId: string;
@@ -33,22 +34,16 @@ export interface ITableName {
 }
 
 export interface IPaginator {
-  totalCount: number;
+  pageIndex: number;
   pageSize: number;
-  pageSizeOptions: Array<number>
+  pageSizeOptions: Array<number>;
+  totalCount: number;
 }
 
 export interface IFilter {
-  column: string;
+  columnName: string;
   operator: string;
   value: any;
-}
-
-export interface IFilterOption {
-  columns: Array<string>;
-  operators: Array<string>;
-  values: Array<any>;
-  valueType: any;
 }
 
 export abstract class AbstractTable {
@@ -59,9 +54,10 @@ export abstract class AbstractTable {
   filters: Array<IFilter> = []
   getDataUrl: string = '';
   paginator: IPaginator = {
-    totalCount : 100,
+    pageIndex: 0,
     pageSize: 5,
-    pageSizeOptions: [5, 10, 25, 100]
+    pageSizeOptions: [5, 10, 25, 100],
+    totalCount : 100,
   }
   tableRequest: ITableRequest = {
     moduleId: '',
@@ -97,17 +93,22 @@ export abstract class AbstractTable {
   setData(res: ITableResponse): void {
     this.displayedColumns = res.displayedColumns;
     this.rowData = res.rowData;
-    this.paginator.totalCount = res.totalCount;
+    this.paginator = {
+      ...this.paginator,
+      pageIndex: res.pageIndex,
+      pageSize: res.pageSize,
+      totalCount: res.totalCount
+    }
   }
 
   applySearch(event: Event): void {
     const searchInput = (event.target as HTMLInputElement).value;
     this.tableRequest.searchTerm = searchInput;
-    this.getData();
+    this.goToFirstPage();
   }
 
   goToFirstPage(): void {
-    this.tableRequest.pageIndex = 1;
+    this.tableRequest.pageIndex = 0;
     this.tableRequest.pageSize = 5;
     this.getData()
   }
@@ -120,7 +121,7 @@ export abstract class AbstractTable {
 
   tableNameChange(event: MatSelectChange) {
     this.tableRequest.tableId = event.value;
-    this.getData();
+    this.goToFirstPage();
     this.getFilters();
   }
 
@@ -148,6 +149,16 @@ export abstract class AbstractTable {
   }
 
   addFilter(): void {
-    this.filters.push({ column: '', operator: '', value: '' })
+    this.filters.push({ columnName: '', operator: '', value: '' })
+  }
+
+  deleteFilter(index: number): void {
+    this.filters.splice(index, 1);
+  }
+
+  openEditFilterDialog(editFilterDialog: ComponentType<AbstractEditFilterDialog>, filter: IFilter, index: number): void {
+    this.openDialog(editFilterDialog, filter, (result: IFilter) => {
+      this.filters[index] = result;
+    })
   }
 }

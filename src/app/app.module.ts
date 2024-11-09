@@ -17,16 +17,21 @@ import {MatIconModule} from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatCardModule } from '@angular/material/card';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 import { AppComponent } from './app.component';
 import { MyTableComponent } from './my-table/my-table.component';
 import { MyNewDialogComponent } from './my-new-dialog/my-new-dialog.component';
+import { MyEditFilterDialogComponent } from './my-edit-filter-dialog/my-edit-filter-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MyTableComponent,
-    MyNewDialogComponent
+    MyNewDialogComponent,
+    MyEditFilterDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -46,9 +51,10 @@ import { MyNewDialogComponent } from './my-new-dialog/my-new-dialog.component';
     MatIconModule,
     MatSnackBarModule,
     MatSidenavModule,
-    MatCardModule
+    MatCardModule,
+    MatDatepickerModule
   ],
-  providers: [],
+  providers: [provideNativeDateAdapter()],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

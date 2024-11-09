@@ -18,8 +18,8 @@ export class TableService {
   getData(request: ITableRequest): Observable<ITableResponse> {
     const { tableId, searchTerm, pageIndex, pageSize } = request;
     const length: number = tableId === '1' ? 50 : 100;
-    const start: number = (pageIndex - 1) * pageSize;
-    const end: number = (pageIndex - 1) * pageSize + pageSize;
+    const start: number = pageIndex * pageSize;
+    const end: number = pageIndex * pageSize + pageSize;
     let users = Array.from({length: length}, (_, k) => createNewUser(k + 1));
     if(searchTerm) {
       users = users.filter((user) => {
@@ -50,14 +50,14 @@ export class TableService {
 
   getFilters(tableId: string): Observable<Array<IFilter>> {
     let filters = [{
-      column: 'Name',
-      operator: 'equals',
+      columnName: 'Name',
+      operator: 'Equals',
       value: 'test'
     }]
 
     if(tableId == '1') {
       filters = [{
-        column: 'ID',
+        columnName: 'ID',
         operator: 'Not equals',
         value: 'test'
       }]

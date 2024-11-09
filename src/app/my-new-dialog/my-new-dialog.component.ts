@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AbstractDialog } from '../shared/abstract-dialog/abstract-dialog';
+import { AbstractDialog } from '../shared/dialog/abstract-dialog';
 import { Observable } from 'rxjs';
 import { FormControl, FormGroup } from '@angular/forms';
 import { TableService } from '../shared/table/table.service';

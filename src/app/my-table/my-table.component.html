@@ -29,10 +29,10 @@
     <button mat-button (click)="saveFilters(); drawer.close()">Save</button>
     <button mat-button (click)="drawer.close()">Cancel</button>
 
-    @for(filter of filters; track filter) {
+    @for(filter of filters; track $index) {
       <mat-card>
         <mat-card-header>
-          <mat-card-title>{{ filter.column }}</mat-card-title>
+          <mat-card-title>{{ filter.columnName }}</mat-card-title>
           <mat-card-subtitle>{{ filter.operator }}</mat-card-subtitle>
         </mat-card-header>
   
@@ -41,14 +41,14 @@
         </mat-card-content>
   
         <mat-card-actions>
-          <button mat-button>Edit</button>
-          <button mat-button>Delete</button>
+          <button mat-button (click)="openMyEditFilterDialog(filter, $index)">Edit</button>
+          <button mat-button (click)="deleteFilter($index)">Delete</button>
         </mat-card-actions>
       </mat-card>
       <br/>
     }
 
-    <button mat-button (click)="addFilter()">Add</button>
+    <button mat-button (click)="addFilter()">Add Filter</button>
   </mat-drawer>
 
   <mat-drawer-content>
@@ -91,6 +91,7 @@
       <mat-paginator 
         aria-label="Select page of users"
         [length]="paginator.totalCount"
+        [pageIndex]="paginator.pageIndex"
         [pageSize]="paginator.pageSize"
         [pageSizeOptions]="paginator.pageSizeOptions"
         (page)="pageChange($event)"
