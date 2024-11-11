@@ -18,6 +18,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 import { provideNativeDateAdapter } from '@angular/material/core';
 
@@ -25,13 +27,15 @@ import { AppComponent } from './app.component';
 import { MyTableComponent } from './my-table/my-table.component';
 import { MyNewDialogComponent } from './my-new-dialog/my-new-dialog.component';
 import { MyEditFilterDialogComponent } from './my-edit-filter-dialog/my-edit-filter-dialog.component';
+import { MySearchNameDialogComponent } from './my-search-name-dialog/my-search-name-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MyTableComponent,
     MyNewDialogComponent,
-    MyEditFilterDialogComponent
+    MyEditFilterDialogComponent,
+    MySearchNameDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -52,7 +56,9 @@ import { MyEditFilterDialogComponent } from './my-edit-filter-dialog/my-edit-fil
     MatSnackBarModule,
     MatSidenavModule,
     MatCardModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatChipsModule,
+    MatAutocompleteModule
   ],
   providers: [provideNativeDateAdapter()],
   bootstrap: [AppComponent]

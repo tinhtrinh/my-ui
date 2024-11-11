@@ -3,6 +3,7 @@ import { AbstractDialog } from '../shared/dialog/abstract-dialog';
 import { Observable } from 'rxjs';
 import { FormControl, FormGroup } from '@angular/forms';
 import { TableService } from '../shared/table/table.service';
+import { MySearchNameDialogComponent } from '../my-search-name-dialog/my-search-name-dialog.component';
 
 @Component({
   selector: 'app-my-new-dialog',
@@ -14,7 +15,8 @@ export class MyNewDialogComponent extends AbstractDialog implements OnInit {
   override formGroup = new FormGroup({
     name: new FormControl('test'),
     id: new FormControl(''),
-    fruit: new FormControl('')
+    fruit: new FormControl(''),
+    userName: new FormControl(null as unknown as {name : string})
   });
   fruits: Array<string> = [];
 
@@ -55,5 +57,25 @@ export class MyNewDialogComponent extends AbstractDialog implements OnInit {
     this.submit(this.createNewUser('test', {}), (res: { id: string, name: string }) => {
       this.openSnackBar(`Submit sucess: id ${res.id}, name ${res.name}`)
     })
+  }
+
+  searchRecentlyUser(searchTerm?: string): Observable<Array<{name: string}>> {
+    return new Observable((subscriber) => {
+      subscriber.next([{name: 'Test 1'}, {name: 'Test 2'}]);
+    })
+  }
+
+  searchAllUser(searchTerm?: string): Observable<Array<{name: string}>> {
+    return new Observable((subscriber) => {
+      subscriber.next([{name: 'Test 3'}, {name: 'Test 4'}, {name: 'Test 5'}]);
+    })
+  }
+
+  searchUsers(searchTerm?: string): void {
+    this.search(this.searchRecentlyUser(searchTerm), this.searchAllUser(searchTerm), searchTerm)
+  }
+
+  openSearchUserDialog(searchTerm: string): void {
+    this.openSearchDialog(MySearchNameDialogComponent, searchTerm, 'userName');
   }
 }

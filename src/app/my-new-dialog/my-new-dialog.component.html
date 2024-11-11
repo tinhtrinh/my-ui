@@ -24,9 +24,55 @@
     </mat-select>
   </mat-form-field>
 
+  <mat-form-field>
+    <mat-label>User Name</mat-label>
+    
+    <mat-chip-grid #userChipGrid>
+      @if(!isDisplaySearchBox('userName')) {
+        <mat-chip-row
+          style="width: 100%;"
+          (removed)="removeSelection('userName')"
+        >
+          {{ this.formGroup.controls.userName.value?.name }}
+          <button matChipRemove style="position: relative; right: 5%;">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+      }
+    </mat-chip-grid>
+
+    <input 
+      #userSearch
+      matInput 
+      [hidden]="!isDisplaySearchBox('userName')"
+      [matChipInputFor]="userChipGrid"
+      [matAutocomplete]="userAuto"
+      (focus)="searchUsers(userSearch.value)"
+      (keyup)="searchUsers(userSearch.value)"
+    >
+
+    <mat-autocomplete 
+      #userAuto="matAutocomplete" 
+      (optionSelected)="selected($event, 'userName'); clearSearchBox($event, userSearch)"
+    >
+      @if(isSearchRecently(userSearch.value)) {
+        <mat-option disabled>Recently View</mat-option>
+      }
+
+      @if(!isSearchRecently(userSearch.value)) {
+        <mat-option (click)="openSearchUserDialog(userSearch.value)">
+          Show All Result for {{ userSearch.value }}
+        </mat-option>
+      }
+      
+      @for (value of searchValues; track $index) {
+        <mat-option [value]="value">{{value.name}}</mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
 </div>
 
 <mat-dialog-actions>
-    <button mat-button (click)="onClose()">Cancel</button>
-    <button mat-button (click)="onSubmit()">Submit</button>
+  <button mat-button (click)="onClose()">Cancel</button>
+  <button mat-button (click)="onSubmit()">Submit</button>
 </mat-dialog-actions>

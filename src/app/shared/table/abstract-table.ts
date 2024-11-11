@@ -119,6 +119,8 @@ export abstract class AbstractTable {
     this.getData();
   }
 
+  sortChange(event: any): void {}
+
   tableNameChange(event: MatSelectChange) {
     this.tableRequest.tableId = event.value;
     this.goToFirstPage();
