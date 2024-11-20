@@ -38,12 +38,19 @@ export interface IPaginator {
   pageSize: number;
   pageSizeOptions: Array<number>;
   totalCount: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
 }
 
 export interface IFilter {
   columnName: string;
   operator: string;
   value: any;
+}
+
+enum SCROLL_DIRECTION {
+  UP,
+  DOWN
 }
 
 export abstract class AbstractTable {
@@ -58,15 +65,18 @@ export abstract class AbstractTable {
     pageSize: 5,
     pageSizeOptions: [5, 10, 25, 100],
     totalCount : 100,
+    hasNext: false,
+    hasPrevious: false
   }
   tableRequest: ITableRequest = {
     moduleId: '',
     tableId: '',
     searchTerm: '',
-    pageIndex: 1,
-    pageSize: 5,
+    pageIndex: 0,
+    pageSize: 10,
     filters: []
   };
+  previousScrollDirection: SCROLL_DIRECTION = SCROLL_DIRECTION.DOWN;
 
   private tableService = inject(TableService);
   private readonly dialog = inject(MatDialog);
@@ -85,7 +95,7 @@ export abstract class AbstractTable {
   }
 
   getData(): void {
-    this.tableService.getData(this.tableRequest).subscribe((res) => {
+    this.tableService.getData(this.getDataUrl, this.tableRequest).subscribe((res) => {
       this.setData(res);
     })
   }
@@ -97,7 +107,9 @@ export abstract class AbstractTable {
       ...this.paginator,
       pageIndex: res.pageIndex,
       pageSize: res.pageSize,
-      totalCount: res.totalCount
+      totalCount: res.totalCount,
+      hasNext: res.hasNext,
+      hasPrevious: res.hasPrevious
     }
   }
 
@@ -109,7 +121,7 @@ export abstract class AbstractTable {
 
   goToFirstPage(): void {
     this.tableRequest.pageIndex = 0;
-    this.tableRequest.pageSize = 5;
+    this.tableRequest.pageSize = 10;
     this.getData()
   }
 
@@ -162,5 +174,73 @@ export abstract class AbstractTable {
     this.openDialog(editFilterDialog, filter, (result: IFilter) => {
       this.filters[index] = result;
     })
+  }
+
+  getScrollViewData(scrollDirection: SCROLL_DIRECTION): void {
+    this.tableService.getData(this.getDataUrl, this.tableRequest).subscribe((res) => {
+      if(scrollDirection.valueOf() == SCROLL_DIRECTION.DOWN && this.rowData.length < 30) {
+        res.rowData = this.rowData.concat(res.rowData);
+        this.setData(res);
+        return;
+      }
+
+      if(scrollDirection.valueOf() == SCROLL_DIRECTION.DOWN && this.rowData.length == 30) {
+        this.rowData.splice(0, 10);
+        res.rowData = this.rowData.concat(res.rowData);
+        this.setData(res);
+      }
+
+      if(scrollDirection.valueOf() == SCROLL_DIRECTION.UP && this.rowData.length == 30) {
+        this.rowData.splice(20, 10);
+        res.rowData = res.rowData.concat(this.rowData);
+        this.setData(res);
+      }
+
+      if(scrollDirection.valueOf() == SCROLL_DIRECTION.UP && this.rowData.length < 30) {
+        this.rowData.splice(20, this.rowData.length % 10);
+        res.rowData = res.rowData.concat(this.rowData);
+        this.setData(res);
+      }
+    })
+  }
+
+  scrollViewPageChange(event: Event | any): void {
+    const tableViewHeight = event.target.offsetHeight;
+    let tableScrollHeight = event.target.scrollTop;
+    const scrollLocation = event.target.scrollHeight;
+
+    const distance = 3;
+
+    //Scrolling Down
+    if (scrollLocation <= tableViewHeight + tableScrollHeight) {
+      if(this.previousScrollDirection == SCROLL_DIRECTION.DOWN && this.paginator.hasNext) {
+        this.tableRequest.pageIndex ++;
+        this.getScrollViewData(SCROLL_DIRECTION.DOWN);
+        this.previousScrollDirection = SCROLL_DIRECTION.DOWN
+      }
+
+      if(this.previousScrollDirection == SCROLL_DIRECTION.UP) {
+        this.tableRequest.pageIndex += distance;
+        this.getScrollViewData(SCROLL_DIRECTION.DOWN);
+        this.previousScrollDirection = SCROLL_DIRECTION.DOWN
+      }
+    }
+
+    //Scrolling Up
+    if(tableScrollHeight == 0) {
+      if(this.previousScrollDirection == SCROLL_DIRECTION.DOWN && this.tableRequest.pageIndex >= distance) {
+        event.target.scrollTop+=70;
+        this.tableRequest.pageIndex -= distance;
+        this.getScrollViewData(SCROLL_DIRECTION.UP);
+        this.previousScrollDirection = SCROLL_DIRECTION.UP;
+      }
+
+      if(this.previousScrollDirection == SCROLL_DIRECTION.UP && this.paginator.hasPrevious) {
+        event.target.scrollTop+=70;
+        this.tableRequest.pageIndex --;
+        this.getScrollViewData(SCROLL_DIRECTION.UP);
+        this.previousScrollDirection = SCROLL_DIRECTION.UP;
+      }
+    }
   }
 }

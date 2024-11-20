@@ -6,7 +6,7 @@ import { MyEditFilterDialogComponent } from '../my-edit-filter-dialog/my-edit-fi
 @Component({
   selector: 'app-my-table',
   templateUrl: './my-table.component.html',
-  styleUrl: './my-table.component.css'
+  styleUrls: ['./my-table.component.css', '../shared/table/abstract-table.css']
 })
 export class MyTableComponent extends AbstractTable implements OnInit {
   ngOnInit(): void {

@@ -15,7 +15,7 @@ export class TableService {
     })
   }
 
-  getData(request: ITableRequest): Observable<ITableResponse> {
+  getData(url: string, request: ITableRequest): Observable<ITableResponse> {
     const { tableId, searchTerm, pageIndex, pageSize } = request;
     const length: number = tableId === '1' ? 50 : 100;
     const start: number = pageIndex * pageSize;
@@ -38,8 +38,8 @@ export class TableService {
         pageIndex: pageIndex,
         count: pageUsers.length,
         totalCount: users.length,
-        hasNext: true,
-        hasPrevious: true
+        hasNext: end < length,
+        hasPrevious: pageIndex > 0
       })
     })
   }

@@ -18,12 +18,14 @@ export abstract class AbstractSearchDialog extends AbstractDialog {
       pageSize: 5,
       pageSizeOptions: [5, 10, 25, 100],
       totalCount : 100,
+      hasNext: false,
+      hasPrevious: false
     }
     tableRequest: ITableRequest = {
       moduleId: '',
       tableId: '',
       searchTerm: '',
-      pageIndex: 1,
+      pageIndex: 0,
       pageSize: 5,
       filters: []
     };
@@ -37,7 +39,7 @@ export abstract class AbstractSearchDialog extends AbstractDialog {
     }
 
     getData(): void {
-        this.tableService.getData(this.tableRequest).subscribe((res) => {
+        this.tableService.getData(this.getDataUrl, this.tableRequest).subscribe((res) => {
           this.setData(res);
         })
     }
@@ -49,7 +51,9 @@ export abstract class AbstractSearchDialog extends AbstractDialog {
             ...this.paginator,
             pageIndex: res.pageIndex,
             pageSize: res.pageSize,
-            totalCount: res.totalCount
+            totalCount: res.totalCount,
+            hasNext: res.hasNext,
+            hasPrevious: res.hasPrevious
         }
     }
 
