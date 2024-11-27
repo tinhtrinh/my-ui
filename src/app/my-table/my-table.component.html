@@ -51,7 +51,8 @@
     <button mat-button (click)="addFilter()">Add Filter</button>
   </mat-drawer>
 
-  <mat-drawer-content (scroll)="scrollViewPageChange($event)">
+  <!-- <mat-drawer-content (scroll)="scrollViewPageChange($event)"> -->
+  <mat-drawer-content>
     <div class="mat-elevation-z8 table-container">
       <table mat-table [dataSource]="rowData" matSort>
     
@@ -96,6 +97,53 @@
         [pageSizeOptions]="paginator.pageSizeOptions"
         (page)="pageChange($event)"
       ></mat-paginator> -->
+      <ngb-pagination 
+        class="d-flex justify-content-end" 
+        [collectionSize]="paginator.totalCount" 
+        [pageSize]="paginator.pageSize"
+        [page]="paginator.pageIndex + 1" 
+        [boundaryLinks]="true"
+        (pageChange)="pageChange($event)"
+      >
+        <ng-template ngbPaginationPrevious>Prev</ng-template>
+        <ng-template ngbPaginationNext>Next</ng-template>
+        <ng-template ngbPaginationPages let-page let-pages="pages">
+          <ng-container *ngIf="pages.length > 0">
+            <div class="mb-3 d-flex flex-nowrap px-2">
+              <label 
+                id="paginationInputLabel" 
+                for="paginationInput" 
+                class="col-form-label me-2 ms-1"
+              >
+                Page
+              </label>
+
+              <mat-form-field
+                style="width: 4rem"
+                appearance="outline"
+                id="paginationInput" 
+                aria-labelledby="paginationInputLabel paginationDescription"
+              >
+                <mat-select 
+                  [value]="page"
+                  (selectionChange)="pageChange($event)"
+                >
+                  <mat-option *ngFor="let page of pages" [value]="page">
+                    {{ page }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+                
+              <span 
+                id="paginationDescription" 
+                class="col-form-label text-nowrap px-2"
+              > 
+                of {{ pages.length }}
+              </span>
+            </div>
+          </ng-container>
+        </ng-template>
+      </ngb-pagination>
     </div>
   </mat-drawer-content>
 </mat-drawer-container>
