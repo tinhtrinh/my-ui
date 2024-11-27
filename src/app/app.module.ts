@@ -23,6 +23,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 import { provideNativeDateAdapter } from '@angular/material/core';
 
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
 import { AppComponent } from './app.component';
 import { MyTableComponent } from './my-table/my-table.component';
 import { MyNewDialogComponent } from './my-new-dialog/my-new-dialog.component';
@@ -58,7 +60,8 @@ import { MySearchNameDialogComponent } from './my-search-name-dialog/my-search-n
     MatCardModule,
     MatDatepickerModule,
     MatChipsModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    NgbModule
   ],
   providers: [provideNativeDateAdapter()],
   bootstrap: [AppComponent]

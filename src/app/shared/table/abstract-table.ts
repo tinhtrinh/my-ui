@@ -125,9 +125,21 @@ export abstract class AbstractTable {
     this.getData()
   }
 
-  pageChange(event: PageEvent): void {
-    this.tableRequest.pageIndex = event.pageIndex + 1;
-    this.tableRequest.pageSize = event.pageSize;
+  pageChange($event: PageEvent | number | any): void {
+    if($event.pageSize) {
+      let { pageSize,  pageIndex } = $event;
+      this.tableRequest.pageSize = pageSize;
+      this.tableRequest.pageIndex = pageIndex;
+    } 
+    
+    if($event.value) {
+      this.tableRequest.pageIndex = $event.value - 1;
+    } 
+
+    if(typeof($event) == 'number') {
+      this.tableRequest.pageIndex = $event - 1;
+    }
+    
     this.getData();
   }
 
