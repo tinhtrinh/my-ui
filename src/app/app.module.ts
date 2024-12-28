@@ -20,10 +20,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 import { provideNativeDateAdapter } from '@angular/material/core';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { BootstrapValidationCssDirective } from './shared/bootstrap-validation-css/bootstrap-validation-css.directive';
 
 import { AppComponent } from './app.component';
 import { MyTableComponent } from './my-table/my-table.component';
@@ -37,7 +40,8 @@ import { MySearchNameDialogComponent } from './my-search-name-dialog/my-search-n
     MyTableComponent,
     MyNewDialogComponent,
     MyEditFilterDialogComponent,
-    MySearchNameDialogComponent
+    MySearchNameDialogComponent,
+    BootstrapValidationCssDirective
   ],
   imports: [
     BrowserModule,
@@ -61,7 +65,8 @@ import { MySearchNameDialogComponent } from './my-search-name-dialog/my-search-n
     MatDatepickerModule,
     MatChipsModule,
     MatAutocompleteModule,
-    NgbModule
+    NgbModule,
+    MatCheckboxModule
   ],
   providers: [provideNativeDateAdapter()],
   bootstrap: [AppComponent]

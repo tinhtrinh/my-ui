@@ -21,8 +21,381 @@
 <button mat-button (click)="openMyNewDialog()">New</button>
 
 <button type="button" mat-button (click)="drawer.toggle(); getFilters()">
-  Open Filters
+  Open Filters Drawer
 </button>
+
+<button 
+    type="button"
+    class="btn btn-outline-secondary me-2" 
+    #filterPopover="ngbPopover"
+    [popoverTitle]="filterTitle"
+    [ngbPopover]="filterContent"
+    popoverClass="filter-container"
+    [autoClose]="false"
+>
+    Open Filters Popover
+</button>
+<ng-template #filterTitle>
+    <div class="modal-header">
+        <h4 class="modal-title">Filter</h4>
+    </div>
+</ng-template>
+<ng-template #filterContent>
+        
+    <ng-container *ngIf="isNoFilter()">No filter found</ng-container>
+
+    <ngb-alert 
+        *ngIf="filterGroups.touched && filterGroups.invalid"
+        type="danger" 
+    >
+        {{ toDateError? toDateError['errorMessage'] : 'Please review error(s) on this page.' }}
+    </ngb-alert>
+
+    <ng-container 
+        *ngFor="let filter of filterOptions, index as filterIndex"
+        class="mb-3"
+        [formGroup]="filterGroups"
+    >
+        <ng-container *ngIf="filter.isDisplay">
+            <label>{{ filter.columnLabel }}</label>
+
+            <ng-container [ngSwitch]="filter.columnName">
+                <div
+                    *ngSwitchDefault
+                    class="row needs-validation"
+                    [formGroupName]="filter.columnName"
+                >
+                    <div class="col">
+                        <label for="operatorInput" class="form-label">Operator</label>
+    
+                        <select 
+                            id="operatorInput" 
+                            class="form-select"
+                            formControlName="operator"
+                        >
+                            <option 
+                                *ngFor="let operator of filter.operators; index as operatorIndex"
+                            >
+                                {{ operator }}
+                            </option>
+                        </select>
+                    </div>
+    
+                    <div class="col">
+                        <label for="valueInput" class="form-label">Value</label>
+                        
+                        <div class="input-group has-validation">
+                            <input
+                                id="value"
+                                class="form-control me-3"
+                                formControlName="value"
+                            />
+    
+                            <button 
+                                type="button" 
+                                class="col btn btn-danger"
+                                (click)="removeFilterGroup(filter.columnName); uncheckDisplay(filterIndex)"
+                            >
+                                Delete
+                            </button>
+    
+                            <div class="invalid-feedback">
+                                This field is required.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    *ngSwitchCase="'fruit'"
+                    class="row needs-validation"
+                    [formGroupName]="filter.columnName"
+                >
+                    <div class="col">
+                        <label for="operatorInput" class="form-label">Operator</label>
+    
+                        <select 
+                            id="operatorInput" 
+                            class="form-select"
+                            formControlName="operator"
+                        >
+                            <option 
+                                *ngFor="let operator of filter.operators; index as operatorIndex"
+                            >
+                                {{ operator }}
+                            </option>
+                        </select>
+                    </div>
+    
+                    <div class="col">
+                        <label for="valueInput" class="form-label">Value</label>
+                        
+                        <div class="input-group">
+                            <select 
+                                id="valueInput" 
+                                class="form-select me-3"
+                                value=""
+                                formControlName="value"
+                            >
+                                <option hidden selected></option>
+                                <option *ngFor="let value of filter.valueOptions">
+                                    {{ value }}
+                                </option>
+                            </select>
+    
+                            <button 
+                                type="button" 
+                                class="btn btn-danger"
+                                (click)="removeFilterGroup(filter.columnName); uncheckDisplay(filterIndex)"
+                            >
+                                Delete
+                            </button>
+
+                            <div class="invalid-feedback">
+                                This field is required.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    *ngSwitchCase="'createdDate'"
+                    class="row needs-validation"
+                    [formGroupName]="filter.columnName"
+                >
+                    <div class="col">
+                        <label for="fromDate" class="form-label">From</label>
+    
+                        <div class="input-group has-validation">
+                            <input
+                                id="fromDate"
+                                class="form-control"
+                                formControlName="fromDate"
+                                ngbDatepicker
+				                #fromDate="ngbDatepicker"
+                            />
+                            <button class="btn btn-outline-secondary" (click)="fromDate.toggle()" type="button">D</button>
+
+                            <div *ngIf="fromDateError && fromDateError['notBefore']" class="invalid-feedback">
+                                Please ensure From Date is before To Date.
+                            </div>
+
+                            <div *ngIf="!fromDateError" class="invalid-feedback">
+                                This field is required.
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="col">
+                        <label for="toDate" class="form-label">To</label>
+                        
+                        <div class="input-group has-validation">
+                            <input
+                                id="toDate"
+                                class="form-control"
+                                formControlName="toDate"
+                                ngbDatepicker
+				                #toDate="ngbDatepicker"
+                            />
+                            <button class="btn btn-outline-secondary me-3" (click)="toDate.toggle()" type="button">D</button>
+                            
+                            <button 
+                                type="button" 
+                                class="btn btn-danger"
+                                (click)="removeFilterGroup(filter.columnName); uncheckDisplay(filterIndex)"
+                            >
+                                Delete
+                            </button>
+
+                            <div *ngIf="toDateError && (toDateError['notAfter'] || toDateError['isToday'])" class="invalid-feedback">
+                                {{ toDateError['errorMessage'] }}
+                            </div>
+
+                            <div *ngIf="!toDateError" class="invalid-feedback">
+                                This field is required.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    *ngSwitchCase="'addCondition'"
+                    class="col"
+                >
+                    <ng-container [formArrayName]="filter.columnName">
+                        <ng-container *ngFor="let condition of getFilterFormArray(filter.columnName), index as conditionIndex">
+                            <div 
+                                class="row needs-validation mb-2"
+                                [formGroup]="condition"
+                            >
+                                <div class="col">
+                                    <label for="operatorInput" class="form-label">Operator</label>
+            
+                                    <select 
+                                        id="operatorInput" 
+                                        class="form-select"
+                                        formControlName="operator"
+                                    >
+                                        <option 
+                                            *ngFor="let operator of filter.operators; index as operatorIndex"
+                                        >
+                                            {{ operator }}
+                                        </option>
+                                    </select>
+                                </div>
+            
+                                <div class="col">
+                                    <label for="valueInput" class="form-label">Value</label>
+                                    
+                                    <div class="input-group has-validation">
+                                        <input
+                                            id="value"
+                                            class="form-control me-3"
+                                            formControlName="value"
+                                        />
+            
+                                        <button 
+                                            type="button" 
+                                            class="col btn btn-danger"
+                                            (click)="removeConditionGroup(filter, conditionIndex, filterIndex)"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                    
+                    <button 
+                        *ngIf="isDisplayAddCondition(filter)"
+                        type="button" 
+                        class="row btn btn-info ms-1"
+                        (click)="addConditionGroup(filter)"
+                    >
+                        Add Condition
+                    </button>
+                </div>
+
+                <div
+                    *ngSwitchCase="'aggregate'"
+                    class="col"
+                >
+                    <ng-container [formArrayName]="filter.columnName">
+                        <ng-container *ngFor="let condition of getFilterFormArray(filter.columnName), index as conditionIndex">
+                            <div 
+                                class="row needs-validation mb-2"
+                                [formGroup]="condition"
+                            >
+                                <div class="col">
+                                    <label for="aggregateInput" class="form-label">Aggregate</label>
+            
+                                    <div class="input-group has-validation">
+                                        <select 
+                                            id="aggregateInput" 
+                                            class="form-select"
+                                            formControlName="aggregate"
+                                            (change)="changeToUpdateValueOptions(conditionIndex)"
+                                        >
+                                            <option hidden selected></option>
+                                            <option 
+                                                *ngFor="let aggregate of filter.aggregateOptions"
+                                            >
+                                                {{ aggregate }}
+                                            </option>
+                                        </select>
+
+                                        <div class="invalid-feedback">
+                                            This field is required.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <label for="operatorInput" class="form-label">Operator</label>
+            
+                                    <select 
+                                        id="operatorInput" 
+                                        class="form-select"
+                                        formControlName="operator"
+                                    >
+                                        <option 
+                                            *ngFor="let operator of filter.operators"
+                                        >
+                                            {{ operator }}
+                                        </option>
+                                    </select>
+                                </div>
+            
+                                <div class="col">
+                                    <label for="valueInput" class="form-label">Value</label>
+                                    
+                                    <div class="input-group has-validation">
+                                        <select 
+                                            id="valueInput" 
+                                            class="form-select me-2"
+                                            formControlName="value"
+                                        >
+                                            <option hidden selected></option>
+                                                <!-- <option
+                                                    *ngFor="let value of filter.valueOptions[conditionIndex]"
+                                                >
+                                                    {{ value }}
+                                                </option> -->
+                                        </select>
+            
+                                        <button 
+                                            type="button" 
+                                            class="col btn btn-danger"
+                                            (click)="removeConditionGroup(filter, conditionIndex, filterIndex)"
+                                        >
+                                            Delete
+                                        </button>
+            
+                                        <div class="invalid-feedback">
+                                            This field is required.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                    
+                    <button 
+                        *ngIf="isDisplayAddCondition(filter)"
+                        type="button" 
+                        class="row btn btn-info ms-1"
+                        (click)="addConditionGroup(filter)"
+                    >
+                        Add Condition
+                    </button>
+                </div>
+                
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+    <hr>
+
+    <div class="d-flex flex-wrap">
+        <mat-checkbox 
+            *ngFor="let filter of filterOptions, index as filterIndex"
+            style="flex: 50%"
+            [(ngModel)]="filter.isDisplay"
+            (change)="checkToChangeDisplay($event, filterIndex)"
+        >
+            {{ filter.columnLabel }}
+        </mat-checkbox>
+    </div>
+
+    <hr>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="clearAllFilter(); filterPopover.close()">Cancel</button>
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="clearAllFilter()">Clear All</button>
+        <button type="submit" class="btn btn-outline-primary" (click)="applyFilter()">Apply Filter</button>
+    </div>
+</ng-template>
   
 <mat-drawer-container autosize>
   <mat-drawer #drawer mode="side">

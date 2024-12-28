@@ -7,6 +7,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ComponentType } from '@angular/cdk/portal';
 import { AbstractDialog } from '../dialog/abstract-dialog';
 import { AbstractEditFilterDialog } from '../edit-filter-dialog/abstract-edit-filter-dialog';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 export interface ITableRequest {
   moduleId: string;
@@ -53,6 +55,15 @@ enum SCROLL_DIRECTION {
   DOWN
 }
 
+export interface IFilterOption {
+  columnName: string;
+  columnLabel: string;
+  operators: Array<string>;
+  valueApiCaller?: Observable<Array<any>>;
+  isDisplay?: boolean;
+  valueOptions?: Array<any>;
+}
+
 export abstract class AbstractTable {
   tableName: ITableName = {id: '', name: ''};
   tableNames: Array<ITableName> = [];
@@ -77,8 +88,10 @@ export abstract class AbstractTable {
     filters: []
   };
   previousScrollDirection: SCROLL_DIRECTION = SCROLL_DIRECTION.DOWN;
+  filterOptions: Array<IFilterOption> = [];
+  filterGroups: FormGroup = new FormGroup({});
 
-  private tableService = inject(TableService);
+  public tableService = inject(TableService);
   private readonly dialog = inject(MatDialog);
 
   initTable(): void {
@@ -253,6 +266,72 @@ export abstract class AbstractTable {
         this.getScrollViewData(SCROLL_DIRECTION.UP);
         this.previousScrollDirection = SCROLL_DIRECTION.UP;
       }
+    }
+  }
+
+  initFilterOptions(): void {}
+
+  isNoFilter(): boolean {
+    return this.filterOptions.every((filter) => {
+      return !filter.isDisplay
+    })
+  }
+
+  checkToChangeDisplay(event: any, filterIndex: number): void {
+    this.filterOptions[filterIndex].isDisplay = event.checked;
+    const selectedOption = this.filterOptions[filterIndex];
+
+    if(event.checked) {
+      this.addFilterGroup(selectedOption);
+      this.setValueOptions(selectedOption);
+    } else {
+      this.removeFilterGroup(selectedOption.columnName);
+    }
+  }
+
+  uncheckDisplay(filterIndex: number): void {
+    this.filterOptions[filterIndex].isDisplay = false;
+  }
+
+  addFilterGroup(filterOption: IFilterOption): void {
+    const newFilterGroup = new FormGroup({
+      columnName: new FormControl(filterOption.columnName),
+      operator: new FormControl(filterOption.operators[0]),
+      value: new FormControl('', [Validators.required])
+    })
+    
+    this.filterGroups.addControl(filterOption.columnName, newFilterGroup);
+  }
+
+  removeFilterGroup(columnName: string): void {
+    this.filterGroups.controls[columnName].reset();
+    this.filterGroups.removeControl(columnName);
+  }
+
+  setValueOptions(filterOption: IFilterOption): void {
+    if(filterOption.valueApiCaller) {
+      filterOption.valueApiCaller.subscribe((res) => {
+        filterOption.valueOptions = res;
+      })
+    }
+  }
+
+  clearAllFilter(): void {
+    this.filterOptions.forEach((filter, index: number) => {
+      if(filter.isDisplay) {
+        this.removeFilterGroup(filter.columnName);
+        this.uncheckDisplay(index);
+      }
+    })
+  }
+
+  applyFilter(): void {
+    if(this.isNoFilter()) return;
+
+    this.filterGroups.markAllAsTouched();
+    if(this.filterGroups.valid) {
+      this.tableRequest.filters = Object.values(this.filterGroups.value);
+      this.getData();
     }
   }
 }
